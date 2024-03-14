@@ -39,7 +39,7 @@ fmt.Println("Response text:", text)
 
 ```go
 resp, err := requests.Post("http://httpbin.org/post",
-    requests.WithJSONBody(Map{"key": "value"}),
+    requests.WithJSONBody(requests.Map{"key": "value"}),
 )
 if err != nil {
     fmt.Println("Request failed:", err)
