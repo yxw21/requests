@@ -57,7 +57,7 @@ files := requests.Files{
     {FieldName: "file", FileName: "file.txt", FilePath: "/path/1.txt"},
 }
 resp, err := requests.Post("http://httpbin.org/post",
-requests.WithMultipartFiles(files, nil),
+    requests.WithMultipartFiles(files, nil),
 )
 if err != nil {
     fmt.Println("Request failed:", err)
