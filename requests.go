@@ -3,7 +3,6 @@ package requests
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -51,6 +50,7 @@ type RequestOption func(*http.Request, *http.Client) error
 func WithStringBody(body string) RequestOption {
 	return func(req *http.Request, _ *http.Client) error {
 		req.Body = io.NopCloser(strings.NewReader(body))
+		req.ContentLength = int64(len([]byte(body)))
 		req.Header.Set("Content-Type", "text/plain")
 		return nil
 	}
@@ -63,6 +63,7 @@ func WithXMLBody(body any) RequestOption {
 			return err
 		}
 		req.Body = io.NopCloser(bytes.NewReader(xmlData))
+		req.ContentLength = int64(len(xmlData))
 		req.Header.Set("Content-Type", "application/xml")
 		return nil
 	}
@@ -75,6 +76,7 @@ func WithJSONBody(body any) RequestOption {
 			return err
 		}
 		req.Body = io.NopCloser(bytes.NewReader(jsonData))
+		req.ContentLength = int64(len(jsonData))
 		req.Header.Set("Content-Type", "application/json")
 		return nil
 	}
@@ -86,7 +88,9 @@ func WithFormBody(data Map) RequestOption {
 		for key, value := range data {
 			formData.Set(key, fmt.Sprintf("%v", value))
 		}
-		req.Body = io.NopCloser(strings.NewReader(formData.Encode()))
+		encodedData := formData.Encode()
+		req.Body = io.NopCloser(strings.NewReader(encodedData))
+		req.ContentLength = int64(len(encodedData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		return nil
 	}
@@ -128,6 +132,7 @@ func WithMultipartFiles(files Files, otherFields Map) RequestOption {
 			return err
 		}
 		req.Body = io.NopCloser(body)
+		req.ContentLength = int64(body.Len())
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 		return nil
 	}
@@ -195,9 +200,7 @@ func WithCookieJar() RequestOption {
 
 func WithBasicAuth(username, password string) RequestOption {
 	return func(req *http.Request, _ *http.Client) error {
-		auth := username + ":" + password
-		encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
-		req.Header.Set("Authorization", "Basic "+encodedAuth)
+		req.SetBasicAuth(username, password)
 		return nil
 	}
 }
