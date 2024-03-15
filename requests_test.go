@@ -27,21 +27,21 @@ func TestAllMethods(t *testing.T) {
 		if err != nil {
 			t.Fatalf("GET request failed: %v", err)
 		}
-		var result map[string]any
+		var result Map
 		if err := resp.JSON(&result); err != nil {
 			t.Fatalf("Failed to decode JSON: %v", err)
 		}
 		fmt.Println(result)
 	})
 	t.Run("POST", func(t *testing.T) {
-		data := map[string]any{
+		data := Map{
 			"key": "value",
 		}
 		resp, err := Post(serverURL+"/?query=post", WithJSONBody(data), WithTimeout(5*time.Second))
 		if err != nil {
 			t.Fatalf("POST request failed: %v", err)
 		}
-		var result map[string]any
+		var result Map
 		if err := resp.JSON(&result); err != nil {
 			t.Fatalf("Failed to decode JSON: %v", err)
 		}
@@ -56,7 +56,7 @@ func TestAllMethods(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Upload request failed: %v", err)
 		}
-		var result map[string]any
+		var result Map
 		if err := resp.JSON(&result); err != nil {
 			t.Fatalf("Failed to decode JSON: %v", err)
 		}
