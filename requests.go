@@ -141,7 +141,13 @@ func WithMultipartFiles(files Files, otherFields Map) RequestOption {
 func WithHeaders(headers Map) RequestOption {
 	return func(req *http.Request, _ *http.Client) error {
 		for key, value := range headers {
-			req.Header.Set(key, fmt.Sprintf("%v", value))
+			if strings.ToLower(strings.TrimSpace(key)) == "host" {
+				req.Host = fmt.Sprintf("%v", value)
+			} else if strings.ToLower(strings.TrimSpace(key)) == "transfer-encoding" {
+				req.TransferEncoding = []string{fmt.Sprintf("%v", value)}
+			} else {
+				req.Header.Set(key, fmt.Sprintf("%v", value))
+			}
 		}
 		return nil
 	}
