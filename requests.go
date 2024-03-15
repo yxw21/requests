@@ -193,6 +193,14 @@ func WithSkipSSLVerify() RequestOption {
 	}
 }
 
+func WithHTTP2() RequestOption {
+	return func(_ *http.Request, client *http.Client) error {
+		tr := ensureTransport(client)
+		tr.ForceAttemptHTTP2 = true
+		return nil
+	}
+}
+
 func WithCookieJar() RequestOption {
 	return func(_ *http.Request, client *http.Client) error {
 		jar, err := cookiejar.New(nil)
